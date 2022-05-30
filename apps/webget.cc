@@ -8,15 +8,26 @@ using namespace std;
 
 void get_URL(const string &host, const string &path) {
     // Your code here.
+    const uint16_t portnum = ((std::random_device()()) % 50000) + 1025;
 
     // You will need to connect to the "http" service on
     // the computer whose name is in the "host" string,
     // then request the URL path given in the "path" string.
+    TCPSocket socket;
+    socket.connect(Address(host, "http"));
+    socket.write("Get " + path + "HTTP/1.1\r\n");
+    auto recvd = socket.read();
 
     // Then you'll need to print out everything the server sends back,
     // (not just one call to read() -- everything) until you reach
     // the "eof" (end of file).
+    while (!recvd.empty()) {
+        cout << recvd;
+        recvd = socket.read();
+    }
 
+    socket.write("Connection: close\r\n");
+    socket.close();
     cerr << "Function called: get_URL(" << host << ", " << path << ").\n";
     cerr << "Warning: get_URL() has not been implemented yet.\n";
 }
